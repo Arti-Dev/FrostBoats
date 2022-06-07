@@ -1,5 +1,6 @@
 package com.articreep.frostboats;
 
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -7,6 +8,7 @@ import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPlaceEvent;
@@ -65,7 +67,7 @@ public class Listeners implements Listener {
 
             // Should iterate over 25 blocks
             for (int x = center.getBlockX() - radius; x <= center.getBlockX() + radius; x++) {
-                for (int z = center.getBlockZ() - radius; z <= center.getBlockZ(); z++) {
+                for (int z = center.getBlockZ() - radius; z <= center.getBlockZ() + radius; z++) {
 
                     Block block = new Location(center.getWorld(), x, center.getY(), z).getBlock();
 
@@ -81,11 +83,20 @@ public class Listeners implements Listener {
     @EventHandler
     public void onBoatDestroy(VehicleDestroyEvent event) {
         if (frostBoats.containsKey(event.getVehicle().getEntityId())) {
+            Boat boat = (Boat) event.getVehicle();
 
-            // Don't drop the vanilla boat
+            // If the player is in creative mode don't worry about this, let the boat just disappear
+            if (event.getAttacker() instanceof Player) {
+                Player p = (Player) event.getAttacker();
+                if (p.getGameMode() == GameMode.CREATIVE) {
+                    frostBoats.remove(boat.getEntityId());
+                    return;
+                }
+            }
+
+            // Don't drop the vanilla boat otherwise
             event.setCancelled(true);
 
-            Boat boat = (Boat) event.getVehicle();
             World w = boat.getWorld();
             ItemStack item = null;
 
