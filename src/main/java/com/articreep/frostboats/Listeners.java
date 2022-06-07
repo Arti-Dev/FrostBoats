@@ -40,7 +40,7 @@ public class Listeners implements Listener {
 
                     // Since boats sink a little, spawn the boat just a little higher if spawned in water
                     if (event.getBlock().getType() == Material.WATER) {
-                        boat.teleport(boat.getLocation().add(0, 1, 0));
+                        boat.teleport(boat.getLocation().add(0, 0.25, 0));
                     }
                     return;
 
