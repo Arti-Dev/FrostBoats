@@ -1,12 +1,10 @@
 package com.articreep.frostboats;
 
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Boat;
+import org.bukkit.entity.ChestBoat;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -24,7 +22,7 @@ public class Listeners implements Listener {
 
     @EventHandler
     public void onBoatPlace(EntityPlaceEvent event) {
-        if (event.getEntityType() == EntityType.BOAT) {
+        if (event.getEntityType() == EntityType.BOAT || event.getEntityType() == EntityType.CHEST_BOAT) {
             ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
 
             if (item.getEnchantments().isEmpty()) return;
@@ -101,26 +99,49 @@ public class Listeners implements Listener {
             ItemStack item = null;
 
             // Make sure we're giving the right boat type back
-            // TODO Update for 1.19
-            switch (boat.getWoodType()) {
-                case ACACIA:
-                    item = new ItemStack(Material.ACACIA_BOAT);
-                    break;
-                case BIRCH:
-                    item = new ItemStack(Material.BIRCH_BOAT);
-                    break;
-                case JUNGLE:
-                    item = new ItemStack(Material.JUNGLE_BOAT);
-                    break;
-                case GENERIC:
-                    item = new ItemStack(Material.OAK_BOAT);
-                    break;
-                case REDWOOD:
-                    item = new ItemStack(Material.SPRUCE_BOAT);
-                    break;
-                case DARK_OAK:
-                    item = new ItemStack(Material.DARK_OAK_BOAT);
-                    break;
+            // TODO Apparently mangrove boats are of TreeSpecies.GENERIC. Weird.
+            if (boat instanceof ChestBoat) {
+                switch (boat.getWoodType()) {
+                    case ACACIA:
+                        item = new ItemStack(Material.ACACIA_CHEST_BOAT);
+                        break;
+                    case BIRCH:
+                        item = new ItemStack(Material.BIRCH_CHEST_BOAT);
+                        break;
+                    case JUNGLE:
+                        item = new ItemStack(Material.JUNGLE_CHEST_BOAT);
+                        break;
+                    case GENERIC:
+                        item = new ItemStack(Material.OAK_CHEST_BOAT);
+                        break;
+                    case REDWOOD:
+                        item = new ItemStack(Material.SPRUCE_CHEST_BOAT);
+                        break;
+                    case DARK_OAK:
+                        item = new ItemStack(Material.DARK_OAK_CHEST_BOAT);
+                        break;
+                }
+            } else {
+                switch (boat.getWoodType()) {
+                    case ACACIA:
+                        item = new ItemStack(Material.ACACIA_BOAT);
+                        break;
+                    case BIRCH:
+                        item = new ItemStack(Material.BIRCH_BOAT);
+                        break;
+                    case JUNGLE:
+                        item = new ItemStack(Material.JUNGLE_BOAT);
+                        break;
+                    case GENERIC:
+                        item = new ItemStack(Material.OAK_BOAT);
+                        break;
+                    case REDWOOD:
+                        item = new ItemStack(Material.SPRUCE_BOAT);
+                        break;
+                    case DARK_OAK:
+                        item = new ItemStack(Material.DARK_OAK_BOAT);
+                        break;
+                }
             }
 
             // Ensure their frost walker is retained
