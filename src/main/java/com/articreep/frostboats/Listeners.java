@@ -81,15 +81,15 @@ public class Listeners implements Listener {
             boat.getLocation().getWorld().spawnParticle(Particle.SNOWFLAKE, boat.getLocation(), 1, 0, 0, 0, 0);
 
             // Get the blocks underneath the boat - nested for loops
-            int radius = 5 + container.get(frostWalkerKey, PersistentDataType.INTEGER);
+            double radius = 4.9 + container.get(frostWalkerKey, PersistentDataType.INTEGER);
             // Cap the radius
             if (radius > 15) radius = 15;
-            int radiusSquared = radius * radius;
+            double radiusSquared = radius * radius;
 
             Location center = boat.getLocation().clone().getBlock().getLocation().subtract(0, 1, 0);
 
-            for (int x = center.getBlockX() - radius; x <= center.getBlockX() + radius; x++) {
-                for (int z = center.getBlockZ() - radius; z <= center.getBlockZ() + radius; z++) {
+            for (double x = center.getBlockX() - radius; x <= center.getBlockX() + radius; x++) {
+                for (double z = center.getBlockZ() - radius; z <= center.getBlockZ() + radius; z++) {
                     Location l = new Location(center.getWorld(), x, center.getY(), z);
                     if (l.distanceSquared(center) > radiusSquared) continue;
                     Block block = l.getBlock();
