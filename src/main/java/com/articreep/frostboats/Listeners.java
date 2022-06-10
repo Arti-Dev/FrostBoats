@@ -117,6 +117,7 @@ public class Listeners implements Listener {
                 }
                 // Bye bye, Frost Walker.
                 container.set(frostWalkerKey, PersistentDataType.INTEGER, 0);
+                boat.getWorld().playSound(boat.getLocation(), Sound.BLOCK_FIRE_EXTINGUISH, 1, 1);
 
             } else if (durability == 250) {
                 for (Entity entity : boat.getPassengers()) {
