@@ -6,12 +6,12 @@
 
     <groupId>com.articreep.frostboats</groupId>
     <artifactId>FrostBoats</artifactId>
-    <version>1.1</version>
+    <version>1.2</version>
     <packaging>jar</packaging>
 
     <name>FrostBoats</name>
 
-    <description>Boats, but with Frost Walker so you can boat over lakes of ice instead of water.</description>
+    <description>Boats, but with Frost Walker, so you can boat over lakes of ice instead of water.</description>
     <properties>
         <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -70,6 +70,12 @@
             <artifactId>spigot-api</artifactId>
             <version>1.19-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>23.0.0</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

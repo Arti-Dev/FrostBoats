@@ -202,7 +202,7 @@ public class Listeners implements Listener {
     public void onPlayerJoin(PlayerJoinEvent e) {
         // A quick check to ensure recipes are loaded
         if (FrostBoats.getRecipeKeys().isEmpty()) {
-            FrostBoats.loadRecipes();
+            FrostBoats.getPlugin().loadRecipes();
             return;
         }
 

@@ -11,7 +11,6 @@ import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import javax.naming.Name;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,6 +25,7 @@ public final class FrostBoats extends JavaPlugin {
     public void onEnable() {
         plugin = this;
         getServer().getPluginManager().registerEvents(new Listeners(), this);
+        getCommand("reloadfrostboats").setExecutor(new Reload());
         saveDefaultConfig();
 
         // Read from config file
@@ -46,7 +46,7 @@ public final class FrostBoats extends JavaPlugin {
         Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "Unloaded recipes!");
     }
 
-    public static void loadRecipes() {
+    public void loadRecipes() {
         Material[] materials = {Material.ACACIA_BOAT, Material.BIRCH_BOAT, Material.DARK_OAK_BOAT, Material.JUNGLE_BOAT,
                 Material.MANGROVE_BOAT, Material.OAK_BOAT, Material.SPRUCE_BOAT, Material.ACACIA_CHEST_BOAT, Material.BIRCH_CHEST_BOAT,
                 Material.DARK_OAK_CHEST_BOAT, Material.JUNGLE_CHEST_BOAT, Material.MANGROVE_CHEST_BOAT, Material.OAK_CHEST_BOAT, Material.SPRUCE_CHEST_BOAT};
@@ -60,7 +60,7 @@ public final class FrostBoats extends JavaPlugin {
             product.setItemMeta(meta);
 
             // Create the key and make the recipe
-            NamespacedKey key = new NamespacedKey(getPlugin(), "frosted_" + material.toString().toLowerCase());
+            NamespacedKey key = new NamespacedKey(this, "frosted_" + material.toString().toLowerCase());
             recipeKeys.add(key);
             ShapedRecipe recipe = new ShapedRecipe(key, product);
             recipe.shape("   ", "PBP", "SSS");
@@ -76,6 +76,20 @@ public final class FrostBoats extends JavaPlugin {
                 p.discoverRecipe(key);
             }
         }
+    }
+
+    public void reload() {
+        // Reload all recipes
+        for (NamespacedKey key : recipeKeys) {
+            Bukkit.removeRecipe(key);
+        }
+
+        loadRecipes();
+
+        // Reload config values
+        reloadConfig();
+        maxDurability = getConfig().getInt("durability");
+        radiusUncapped = getConfig().getBoolean("uncapradius");
     }
 
     public static FrostBoats getPlugin() {
