@@ -1,0 +1,6 @@
+# Controls the durability that new FrostBoats start with. Defaults to 1000.
+# Set to -1 for infinite durability.
+durability: 1000
+# The radius of ice generated when using a FrostBoat is capped at a radius of 14.9.
+# If you would like to uncap this set this to true!
+uncapradius: false

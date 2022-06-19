@@ -39,14 +39,12 @@ public class Listeners implements Listener {
             for (Enchantment enchantment : item.getEnchantments().keySet()) {
                 if (enchantment.equals(Enchantment.FROST_WALKER)) {
 
-                    // Cool, it's a frost walker boat.
-
                     // Add Frost Walker level to the Boat's PersistentDataContainer
                     entityContainer.set(frostWalkerKey, PersistentDataType.INTEGER, item.getEnchantments().get(enchantment));
 
                     // Does this boat have a durability value yet?
                     if (!itemContainer.has(durabilityKey, PersistentDataType.INTEGER)) {
-                        entityContainer.set(durabilityKey, PersistentDataType.INTEGER, FrostBoats.maxDurability);
+                        entityContainer.set(durabilityKey, PersistentDataType.INTEGER, FrostBoats.getMaxDurability());
                     } else {
                         // grab the value
                         entityContainer.set(durabilityKey, PersistentDataType.INTEGER,
@@ -83,7 +81,7 @@ public class Listeners implements Listener {
             // Get the blocks underneath the boat - nested for loops
             double radius = 4.9 + container.get(frostWalkerKey, PersistentDataType.INTEGER);
             // Cap the radius
-            if (radius > 15) radius = 15;
+            if (radius > 15 && !FrostBoats.isRadiusUncapped()) radius = 15;
             double radiusSquared = radius * radius;
 
             Location center = boat.getLocation().clone().getBlock().getLocation().subtract(0, 1, 0);
@@ -110,18 +108,22 @@ public class Listeners implements Listener {
             if (!hasGeneratedIce) return;
 
             int durability = container.get(durabilityKey, PersistentDataType.INTEGER);
+
+            // If the durability is negative don't decrement durability
+            if (durability < 0) return;
+
             // Durability ran out?
-            if (durability - 1 <= 0) {
+            if (durability - 1 == 0) {
                 for (Entity entity : boat.getPassengers()) {
-                    entity.sendMessage(ChatColor.AQUA + "Your boat's Frost Durability has run out!");
+                    entity.sendMessage(ChatColor.AQUA + "Your Frost Walker boat's durability has run out!");
                 }
-                // Bye bye, Frost Walker.
+                // Remove Frost Walker
                 container.set(frostWalkerKey, PersistentDataType.INTEGER, 0);
                 boat.getWorld().playSound(boat.getLocation(), Sound.BLOCK_FIRE_EXTINGUISH, 1, 1);
-
-            } else if (durability == 250) {
+            // A warning when durability is low
+            } else if (durability == Math.floor(FrostBoats.getMaxDurability() * 0.25)) {
                 for (Entity entity : boat.getPassengers()) {
-                    entity.sendMessage(ChatColor.AQUA + "Your Frost Walker boat has 250 durability remaining!");
+                    entity.sendMessage(ChatColor.AQUA + "Your Frost Walker boat has 25% durability remaining!");
                 }
             }
             container.set(durabilityKey, PersistentDataType.INTEGER, durability - 1);
@@ -147,7 +149,7 @@ public class Listeners implements Listener {
             event.setCancelled(true);
 
             World w = boat.getWorld();
-            ItemStack item = null;
+            ItemStack item;
             PersistentDataContainer container = boat.getPersistentDataContainer();
 
             // Make sure we're giving the right boat type back
@@ -198,6 +200,12 @@ public class Listeners implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
+        // A quick check to ensure recipes are loaded
+        if (FrostBoats.getRecipeKeys().isEmpty()) {
+            FrostBoats.loadRecipes();
+            return;
+        }
+
         for (NamespacedKey key : FrostBoats.getRecipeKeys()) {
             e.getPlayer().discoverRecipe(key);
         }

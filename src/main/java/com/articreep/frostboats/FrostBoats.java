@@ -19,14 +19,34 @@ import java.util.List;
 public final class FrostBoats extends JavaPlugin {
     private static FrostBoats plugin;
     private static final List<NamespacedKey> recipeKeys = new ArrayList<>();
-    public static final int maxDurability = 1000;
+    private static int maxDurability = 1000;
+    private static boolean radiusUncapped = false;
 
     @Override
     public void onEnable() {
         plugin = this;
         getServer().getPluginManager().registerEvents(new Listeners(), this);
+        saveDefaultConfig();
 
-        // Recipe time!
+        // Read from config file
+        maxDurability = getConfig().getInt("durability");
+        radiusUncapped = getConfig().getBoolean("uncapradius");
+
+        loadRecipes();
+
+        Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "Get frosting! Plugin loaded.");
+    }
+
+    @Override
+    public void onDisable() {
+        for (NamespacedKey key : recipeKeys) {
+            Bukkit.removeRecipe(key);
+        }
+
+        Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "Unloaded recipes!");
+    }
+
+    public static void loadRecipes() {
         Material[] materials = {Material.ACACIA_BOAT, Material.BIRCH_BOAT, Material.DARK_OAK_BOAT, Material.JUNGLE_BOAT,
                 Material.MANGROVE_BOAT, Material.OAK_BOAT, Material.SPRUCE_BOAT, Material.ACACIA_CHEST_BOAT, Material.BIRCH_CHEST_BOAT,
                 Material.DARK_OAK_CHEST_BOAT, Material.JUNGLE_CHEST_BOAT, Material.MANGROVE_CHEST_BOAT, Material.OAK_CHEST_BOAT, Material.SPRUCE_CHEST_BOAT};
@@ -40,7 +60,7 @@ public final class FrostBoats extends JavaPlugin {
             product.setItemMeta(meta);
 
             // Create the key and make the recipe
-            NamespacedKey key = new NamespacedKey(this, "frosted_" + material.toString().toLowerCase());
+            NamespacedKey key = new NamespacedKey(getPlugin(), "frosted_" + material.toString().toLowerCase());
             recipeKeys.add(key);
             ShapedRecipe recipe = new ShapedRecipe(key, product);
             recipe.shape("   ", "PBP", "SSS");
@@ -56,17 +76,6 @@ public final class FrostBoats extends JavaPlugin {
                 p.discoverRecipe(key);
             }
         }
-
-        Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "Get frosting! Plugin loaded.");
-    }
-
-    @Override
-    public void onDisable() {
-        for (NamespacedKey key : recipeKeys) {
-            Bukkit.removeRecipe(key);
-        }
-
-        Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "Unloaded recipes!");
     }
 
     public static FrostBoats getPlugin() {
@@ -75,5 +84,13 @@ public final class FrostBoats extends JavaPlugin {
 
     public static List<NamespacedKey> getRecipeKeys() {
         return recipeKeys;
+    }
+
+    public static boolean isRadiusUncapped() {
+        return radiusUncapped;
+    }
+
+    public static int getMaxDurability() {
+        return maxDurability;
     }
 }
