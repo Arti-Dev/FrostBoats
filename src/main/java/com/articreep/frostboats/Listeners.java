@@ -152,10 +152,7 @@ public class Listeners implements Listener {
             // Is it a FrostBoat?
             if (container.get(frostWalkerKey, PersistentDataType.INTEGER) > 0) {
 
-                // If the durability is less than zero just return
-                if (container.get(durabilityKey, PersistentDataType.INTEGER ) < 0) return;
-
-                // Otherwise, start a BukkitRunnable for the player
+                // Start a BukkitRunnable for the player
                 new DurabilityBarRunnable(((Player) event.getEntered()).getPlayer()).runTaskTimer(FrostBoats.getPlugin(), 40, 1);
             }
         }

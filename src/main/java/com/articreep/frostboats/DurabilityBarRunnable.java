@@ -21,6 +21,7 @@ public class DurabilityBarRunnable extends BukkitRunnable {
 
     @Override
     public void run() {
+
         if (!player.isInsideVehicle()) {
             this.cancel();
             return;
@@ -34,6 +35,14 @@ public class DurabilityBarRunnable extends BukkitRunnable {
 
         int durability = container.get(durabilityKey, PersistentDataType.INTEGER);
 
+        // If durability is below 0 it is infinite, send a special message
+        if (durability < 0) {
+            player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                    new ComponentBuilder("Frost Walker Durability: ")
+                            .append("Infinite!").color(ChatColor.GREEN).create());
+            return;
+        }
+
         // Choose the color of the message
         ChatColor color;
         if (durability > FrostBoats.getMaxDurability() * 0.5) color = ChatColor.GREEN;
@@ -44,7 +53,7 @@ public class DurabilityBarRunnable extends BukkitRunnable {
                 new ComponentBuilder("Frost Walker Durability: ")
                         .append(Integer.toString(durability)).color(color).create());
 
-        if (durability <= 0) this.cancel();
+        if (durability == 0) this.cancel();
 
     }
 }
