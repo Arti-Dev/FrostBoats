@@ -20,6 +20,7 @@ public final class FrostBoats extends JavaPlugin {
     private static final List<NamespacedKey> recipeKeys = new ArrayList<>();
     private static int maxDurability = 1000;
     private static boolean radiusUncapped = false;
+    private static int frostWalkerRecipeLevel = 2;
 
     @Override
     public void onEnable() {
@@ -31,6 +32,9 @@ public final class FrostBoats extends JavaPlugin {
         // Read from config file
         maxDurability = getConfig().getInt("durability");
         radiusUncapped = getConfig().getBoolean("uncapradius");
+        frostWalkerRecipeLevel = getConfig().getInt("frostwalkerrecipelevel");
+        if (frostWalkerRecipeLevel <= 0 || frostWalkerRecipeLevel > 255) frostWalkerRecipeLevel = 2;
+
 
         loadRecipes();
 
@@ -54,7 +58,7 @@ public final class FrostBoats extends JavaPlugin {
         for (Material material : materials) {
             // Create the product of the recipe
             ItemStack product = new ItemStack(material);
-            product.addUnsafeEnchantment(Enchantment.FROST_WALKER, 2);
+            product.addUnsafeEnchantment(Enchantment.FROST_WALKER, frostWalkerRecipeLevel);
             ItemMeta meta = product.getItemMeta();
             meta.setLore(Collections.singletonList(ChatColor.DARK_GRAY + "Durability: " + maxDurability));
             product.setItemMeta(meta);
@@ -84,12 +88,15 @@ public final class FrostBoats extends JavaPlugin {
             Bukkit.removeRecipe(key);
         }
 
-        loadRecipes();
-
         // Reload config values
         reloadConfig();
         maxDurability = getConfig().getInt("durability");
         radiusUncapped = getConfig().getBoolean("uncapradius");
+        frostWalkerRecipeLevel = getConfig().getInt("frostwalkerrecipelevel");
+        if (frostWalkerRecipeLevel <= 0 || frostWalkerRecipeLevel > 255) frostWalkerRecipeLevel = 2;
+
+        loadRecipes();
+
     }
 
     public static FrostBoats getPlugin() {
