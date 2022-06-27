@@ -22,6 +22,7 @@ import java.util.Collections;
 public class Listeners implements Listener {
     NamespacedKey frostWalkerKey = new NamespacedKey(FrostBoats.getPlugin(), "frost-walker-level");
     NamespacedKey durabilityKey = new NamespacedKey(FrostBoats.getPlugin(), "durability");
+    NamespacedKey materialKey = new NamespacedKey(FrostBoats.getPlugin(), "material");
 
     @EventHandler
     public void onBoatPlace(EntityPlaceEvent event) {
@@ -50,6 +51,10 @@ public class Listeners implements Listener {
                         entityContainer.set(durabilityKey, PersistentDataType.INTEGER,
                                 itemContainer.get(durabilityKey, PersistentDataType.INTEGER));
                     }
+
+                    // Add the material type to the container.
+                    // I would not have to do this if the TreeSpecies enum had mangrove
+                    entityContainer.set(materialKey, PersistentDataType.STRING, item.getType().toString());
 
 
                     // Since boats sink a little, spawn the boat just a little higher if spawned in water
@@ -150,29 +155,17 @@ public class Listeners implements Listener {
 
             World w = boat.getWorld();
             ItemStack item;
+            Material material;
             PersistentDataContainer container = boat.getPersistentDataContainer();
 
-            // Make sure we're giving the right boat type back
-            // TODO Apparently mangrove boats are of TreeSpecies.GENERIC. Weird.
-            if (boat instanceof ChestBoat) {
-                item = switch (boat.getWoodType()) {
-                    case ACACIA -> new ItemStack(Material.ACACIA_CHEST_BOAT);
-                    case BIRCH -> new ItemStack(Material.BIRCH_CHEST_BOAT);
-                    case JUNGLE -> new ItemStack(Material.JUNGLE_CHEST_BOAT);
-                    case GENERIC -> new ItemStack(Material.OAK_CHEST_BOAT);
-                    case REDWOOD -> new ItemStack(Material.SPRUCE_CHEST_BOAT);
-                    case DARK_OAK -> new ItemStack(Material.DARK_OAK_CHEST_BOAT);
-                };
+            // Construct an ItemStack with the proper material stored in the data container
+            // Backwards "compatibility": If the key doesn't exist, drop an oak boat.
+            if (container.get(materialKey, PersistentDataType.STRING) == null) {
+                material = Material.OAK_BOAT;
             } else {
-                item = switch (boat.getWoodType()) {
-                    case ACACIA -> new ItemStack(Material.ACACIA_BOAT);
-                    case BIRCH -> new ItemStack(Material.BIRCH_BOAT);
-                    case JUNGLE -> new ItemStack(Material.JUNGLE_BOAT);
-                    case GENERIC -> new ItemStack(Material.OAK_BOAT);
-                    case REDWOOD -> new ItemStack(Material.SPRUCE_BOAT);
-                    case DARK_OAK -> new ItemStack(Material.DARK_OAK_BOAT);
-                };
+                material = Material.valueOf(container.get(materialKey, PersistentDataType.STRING));
             }
+            item = new ItemStack(material);
 
             // Ensure their frost walker is retained
             item.addUnsafeEnchantment(Enchantment.FROST_WALKER, container.get(frostWalkerKey, PersistentDataType.INTEGER));
