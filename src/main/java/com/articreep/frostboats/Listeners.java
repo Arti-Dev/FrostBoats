@@ -1,5 +1,7 @@
 package com.articreep.frostboats;
 
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
@@ -11,6 +13,7 @@ import org.bukkit.event.entity.EntityPlaceEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
+import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
@@ -21,9 +24,9 @@ import org.bukkit.persistence.PersistentDataType;
 import java.util.Collections;
 
 public class Listeners implements Listener {
-    NamespacedKey frostWalkerKey = new NamespacedKey(FrostBoats.getPlugin(), "frost-walker-level");
-    NamespacedKey durabilityKey = new NamespacedKey(FrostBoats.getPlugin(), "durability");
-    NamespacedKey materialKey = new NamespacedKey(FrostBoats.getPlugin(), "material");
+    final NamespacedKey frostWalkerKey = new NamespacedKey(FrostBoats.getPlugin(), "frost-walker-level");
+    final NamespacedKey durabilityKey = new NamespacedKey(FrostBoats.getPlugin(), "durability");
+    final NamespacedKey materialKey = new NamespacedKey(FrostBoats.getPlugin(), "material");
 
     @EventHandler
     public void onBoatPlace(EntityPlaceEvent event) {
@@ -115,6 +118,7 @@ public class Listeners implements Listener {
 
             int durability = container.get(durabilityKey, PersistentDataType.INTEGER);
 
+
             // If the durability is negative don't decrement durability
             if (durability < 0) return;
 
@@ -134,6 +138,28 @@ public class Listeners implements Listener {
             }
             container.set(durabilityKey, PersistentDataType.INTEGER, durability - 1);
         }
+    }
+
+    @EventHandler
+    public void onBoatEnter(VehicleEnterEvent event) {
+        if (event.getEntered() instanceof Player) {
+
+            Entity boat = event.getVehicle();
+            PersistentDataContainer container = boat.getPersistentDataContainer();
+
+            if (!container.has(frostWalkerKey, PersistentDataType.INTEGER)) return;
+
+            // Is it a FrostBoat?
+            if (container.get(frostWalkerKey, PersistentDataType.INTEGER) > 0) {
+
+                // If the durability is less than zero just return
+                if (container.get(durabilityKey, PersistentDataType.INTEGER ) < 0) return;
+
+                // Otherwise, start a BukkitRunnable for the player
+                new DurabilityBarRunnable(((Player) event.getEntered()).getPlayer()).runTaskTimer(FrostBoats.getPlugin(), 40, 1);
+            }
+        }
+
     }
 
     @EventHandler
