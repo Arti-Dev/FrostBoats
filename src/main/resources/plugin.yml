@@ -8,3 +8,4 @@ commands:
   reloadfrostboats:
     description: Reloads recipes and config values.
     usage: /reloadfrostboats
+    permission: frostboats.reload
