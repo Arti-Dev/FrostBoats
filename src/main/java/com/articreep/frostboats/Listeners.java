@@ -5,6 +5,7 @@ import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPlaceEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
@@ -204,7 +205,7 @@ public class Listeners implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onBoatCraft(CraftItemEvent e) {
         if (e.getRecipe() instanceof ShapedRecipe recipe) {
             for (NamespacedKey key : FrostBoats.getRecipeKeys()) {
