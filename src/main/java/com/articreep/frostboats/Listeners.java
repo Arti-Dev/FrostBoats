@@ -12,12 +12,15 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPlaceEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
+import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
+import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -190,22 +193,14 @@ public class Listeners implements Listener {
             } else {
                 material = Material.valueOf(container.get(materialKey, PersistentDataType.STRING));
             }
-            item = new ItemStack(material);
 
             // Ensure their frost walker is retained
-            item.addUnsafeEnchantment(Enchantment.FROST_WALKER, container.get(frostWalkerKey, PersistentDataType.INTEGER));
+            int frostLevel = container.get(frostWalkerKey, PersistentDataType.INTEGER);
 
             // Transfer the remaining durability to the item
             int durability = container.get(durabilityKey, PersistentDataType.INTEGER);
-            ItemMeta meta = item.getItemMeta();
-            meta.getPersistentDataContainer().set(durabilityKey, PersistentDataType.INTEGER,
-                    durability);
 
-            // Add a line in the lore that says how much durability is left
-            meta.setLore(Collections.singletonList(ChatColor.DARK_GRAY + "Durability: " + durability));
-
-            // Apply the ItemMeta
-            item.setItemMeta(meta);
+            item = FrostBoats.createFrostBoat(material, durability, frostLevel);
 
             // Kill the existing boat
             boat.remove();
@@ -236,6 +231,37 @@ public class Listeners implements Listener {
                 if (recipe.getKey().equals(key)) {
                     e.getWhoClicked().getInventory().addItem(new ItemStack(Material.BUCKET, 2));
                 }
+            }
+        }
+    }
+
+    // TODO Make this anvil recipe configurable
+    @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    public void onAnvilUse(PrepareAnvilEvent event) {
+        AnvilInventory inventory = event.getInventory();
+
+        // If there are not two materials in the anvil quit out
+        ItemStack itemboat = inventory.getItem(0);
+        ItemStack itembook = inventory.getItem(1);
+
+        if (itemboat == null || itembook == null) return;
+
+        // Check both items
+        // Loop through a static list of boat Material types
+        for (Material material : FrostBoats.materials) {
+            if (itemboat.getType() == material && itembook.getType() == Material.ENCHANTED_BOOK) {
+
+                // Book enchantments are stored in meta so have to go there.
+                EnchantmentStorageMeta meta = (EnchantmentStorageMeta) itembook.getItemMeta();
+
+                if (meta.hasStoredEnchant(Enchantment.FROST_WALKER)) {
+                    // What level?
+                    int frostLevel = meta.getStoredEnchantLevel(Enchantment.FROST_WALKER);
+                    ItemStack product = FrostBoats.createFrostBoat(itemboat.getType(), -1, frostLevel, inventory.getRenameText());
+                    inventory.setRepairCost(10); //TODO Make this configurable
+                    event.setResult(product);
+                }
+
             }
         }
     }
