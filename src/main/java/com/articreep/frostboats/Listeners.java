@@ -221,6 +221,7 @@ public class Listeners implements Listener {
     @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onBoatCraft(CraftItemEvent e) {
         if (e.getRecipe() instanceof ShapedRecipe recipe) {
+            // If no recipes are loaded the list will be empty and nothing will happen
             for (NamespacedKey key : FrostBoats.getRecipeKeys()) {
                 if (recipe.getKey().equals(key)) {
                     e.getWhoClicked().getInventory().addItem(new ItemStack(Material.BUCKET, 2));
@@ -229,9 +230,11 @@ public class Listeners implements Listener {
         }
     }
 
-    // TODO Make this anvil recipe configurable
     @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onAnvilUse(PrepareAnvilEvent event) {
+
+        if (!FrostBoats.canLoadAnvilRecipes()) return;
+
         AnvilInventory inventory = event.getInventory();
 
         // If there are not two materials in the anvil quit out
@@ -252,7 +255,10 @@ public class Listeners implements Listener {
                     // What level?
                     int frostLevel = meta.getStoredEnchantLevel(Enchantment.FROST_WALKER);
                     ItemStack product = FrostBoats.createFrostBoat(itemboat.getType(), -1, frostLevel, inventory.getRenameText());
-                    inventory.setRepairCost(10); //TODO Make this configurable
+                    // Formula is base-cost * level, caps at 40
+                    int cost = FrostBoats.getBaseAnvilCost() * frostLevel;
+                    if (cost > 39) cost = 39;
+                    inventory.setRepairCost(cost);
                     event.setResult(product);
                 }
 

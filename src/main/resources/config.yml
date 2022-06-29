@@ -1,6 +1,16 @@
-# Controls the durability that new FrostBoats start with. Defaults to 1000.
+# Controls the durability that regular FrostBoats start with. Defaults to 1000.
 # Set to -1 for infinite durability.
 durability: 1000
+# Controls whether to load the recipes for crafting FrostBoats in crafting tables. Defaults to true.
+loadcraftingrecipes: true
+# FrostBoats can also be crafted by applying Frost Walker books on a boat in an anvil.
+# Boats obtained in this way have infinite durability.
+# If you would like to disable this set this to false!
+loadanvilrecipes: true
+# The cost (in experience levels) to create a Frost Walker Boat from an anvil.
+# The formula is base-cost * level with a maximum of 39 levels.
+# Defaults to 12.
+baseanvilcost: 12
 # Controls the level of Frost Walker when a boat is crafted using the recipe.
 # Defaults to 2 if an invalid number is provided (below 1 or above 255)
 frostwalkerrecipelevel: 2
