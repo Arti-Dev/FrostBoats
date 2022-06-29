@@ -21,11 +21,8 @@ import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-
-import java.util.Collections;
 
 public class Listeners implements Listener {
     final NamespacedKey frostWalkerKey = new NamespacedKey(FrostBoats.getPlugin(), "frost-walker-level");
@@ -45,33 +42,30 @@ public class Listeners implements Listener {
             PersistentDataContainer entityContainer = boat.getPersistentDataContainer();
 
             // Check enchantments for frost walker
-            for (Enchantment enchantment : item.getEnchantments().keySet()) {
-                if (enchantment.equals(Enchantment.FROST_WALKER)) {
+            if (item.getEnchantments().containsKey(Enchantment.FROST_WALKER)) {
 
-                    // Add Frost Walker level to the Boat's PersistentDataContainer
-                    entityContainer.set(frostWalkerKey, PersistentDataType.INTEGER, item.getEnchantments().get(enchantment));
+                // Add Frost Walker level to the Boat's PersistentDataContainer
+                entityContainer.set(frostWalkerKey, PersistentDataType.INTEGER, item.getEnchantments().get(Enchantment.FROST_WALKER));
 
-                    // Does this boat have a durability value yet?
-                    if (!itemContainer.has(durabilityKey, PersistentDataType.INTEGER)) {
-                        entityContainer.set(durabilityKey, PersistentDataType.INTEGER, FrostBoats.getMaxDurability());
-                    } else {
-                        // grab the value
-                        entityContainer.set(durabilityKey, PersistentDataType.INTEGER,
-                                itemContainer.get(durabilityKey, PersistentDataType.INTEGER));
-                    }
-
-                    // Add the material type to the container.
-                    // I would not have to do this if the TreeSpecies enum had mangrove
-                    entityContainer.set(materialKey, PersistentDataType.STRING, item.getType().toString());
-
-
-                    // Since boats sink a little, spawn the boat just a little higher if spawned in water
-                    if (event.getBlock().getType() == Material.WATER) {
-                        boat.teleport(boat.getLocation().add(0, 0.25, 0));
-                    }
-                    return;
-
+                // Does this boat have a durability value yet?
+                if (!itemContainer.has(durabilityKey, PersistentDataType.INTEGER)) {
+                    entityContainer.set(durabilityKey, PersistentDataType.INTEGER, FrostBoats.getMaxDurability());
+                } else {
+                    // grab the value
+                    entityContainer.set(durabilityKey, PersistentDataType.INTEGER,
+                            itemContainer.get(durabilityKey, PersistentDataType.INTEGER));
                 }
+
+                // Add the material type to the container.
+                // I would not have to do this if the TreeSpecies enum had mangrove
+                entityContainer.set(materialKey, PersistentDataType.STRING, item.getType().toString());
+
+
+                // Since boats sink a little, spawn the boat just a little higher if spawned in water
+                if (event.getBlock().getType() == Material.WATER) {
+                    boat.teleport(boat.getLocation().add(0, 0.25, 0));
+                }
+
             }
         }
     }
