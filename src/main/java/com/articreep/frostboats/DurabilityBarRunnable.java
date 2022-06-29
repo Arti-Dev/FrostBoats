@@ -36,9 +36,15 @@ public class DurabilityBarRunnable extends BukkitRunnable {
 
         // If durability is below 0 it is infinite, send a special message
         if (durability < 0) {
+
+            if (FrostBoats.shouldHideInfiniteDurability()) {
+                this.cancel();
+                return;
+            }
+
             player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
                     new ComponentBuilder("Frost Walker Durability: ")
-                            .append("Infinite!").color(ChatColor.GREEN).create());
+                            .append("∞").color(ChatColor.GREEN).create());
             return;
         }
 

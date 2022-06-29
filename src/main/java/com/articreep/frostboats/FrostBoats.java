@@ -28,6 +28,7 @@ public final class FrostBoats extends JavaPlugin {
     private static int baseAnvilCost = 12;
     private static boolean loadCraftingRecipes = true;
     private static boolean loadAnvilRecipes = true;
+    private static boolean hideInfiniteDurability = false;
 
     public static final Set<Material> materials = Set.of(Material.ACACIA_BOAT, Material.BIRCH_BOAT, Material.DARK_OAK_BOAT, Material.JUNGLE_BOAT,
             Material.MANGROVE_BOAT, Material.OAK_BOAT, Material.SPRUCE_BOAT, Material.ACACIA_CHEST_BOAT, Material.BIRCH_CHEST_BOAT,
@@ -116,6 +117,7 @@ public final class FrostBoats extends JavaPlugin {
         baseAnvilCost = getConfig().getInt("baseanvilcost");
         loadCraftingRecipes = getConfig().getBoolean("loadcraftingrecipes");
         loadAnvilRecipes = getConfig().getBoolean("loadanvilrecipes");
+        hideInfiniteDurability = getConfig().getBoolean("hideinfinitelore");
     }
 
     public static FrostBoats getPlugin() {
@@ -147,6 +149,10 @@ public final class FrostBoats extends JavaPlugin {
         return baseAnvilCost;
     }
 
+    public static boolean shouldHideInfiniteDurability() {
+        return hideInfiniteDurability;
+    }
+
     /**
      * Constructs a FrostBoat ItemStack.
      * @param material The item material - must be a boat
@@ -164,7 +170,13 @@ public final class FrostBoats extends JavaPlugin {
         product.addUnsafeEnchantment(Enchantment.FROST_WALKER, level);
 
         ItemMeta meta = product.getItemMeta();
-        meta.setLore(Collections.singletonList(ChatColor.DARK_GRAY + "Durability: " + durability));
+
+        if (durability < 0) {
+            if (!hideInfiniteDurability) {
+                meta.setLore(Collections.singletonList(ChatColor.DARK_GRAY + "Durability: " + "∞"));
+            }
+        } else meta.setLore(Collections.singletonList(ChatColor.DARK_GRAY + "Durability: " + durability));
+
         meta.getPersistentDataContainer().set(durabilityKey, PersistentDataType.INTEGER,
                 durability);
         product.setItemMeta(meta);
@@ -189,7 +201,13 @@ public final class FrostBoats extends JavaPlugin {
 
         ItemMeta meta = product.getItemMeta();
         meta.setDisplayName(name);
-        meta.setLore(Collections.singletonList(ChatColor.DARK_GRAY + "Durability: " + durability));
+
+        if (durability < 0) {
+            if (!hideInfiniteDurability) {
+                meta.setLore(Collections.singletonList(ChatColor.DARK_GRAY + "Durability: " + "∞"));
+            }
+        } else meta.setLore(Collections.singletonList(ChatColor.DARK_GRAY + "Durability: " + durability));
+
         meta.getPersistentDataContainer().set(durabilityKey, PersistentDataType.INTEGER,
                 durability);
         product.setItemMeta(meta);

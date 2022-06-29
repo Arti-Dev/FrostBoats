@@ -82,6 +82,17 @@ public class Listeners implements Listener {
         // Is it a frostboat?
         if (container.get(frostWalkerKey, PersistentDataType.INTEGER) > 0) {
 
+            // Check if the durability is already somehow zero. This can be caused by the config.
+            // If so remove frost walker and do not send a message.
+            int durability = container.get(durabilityKey, PersistentDataType.INTEGER);
+
+            if (durability == 0) {
+                container.set(frostWalkerKey, PersistentDataType.INTEGER, 0);
+                boat.getWorld().playSound(boat.getLocation(), Sound.BLOCK_FIRE_EXTINGUISH, 1, 1);
+                return;
+            }
+
+            // Otherwise..
             // Spawn a cute particle
             boat.getLocation().getWorld().spawnParticle(Particle.SNOWFLAKE, boat.getLocation(), 1, 0, 0, 0, 0);
 
@@ -113,9 +124,6 @@ public class Listeners implements Listener {
             // After all this is done, decrement the durability of the boat down by 1.
             // unless it didn't frost anything, in that case just return as there's nothing else to do
             if (!hasGeneratedIce) return;
-
-            int durability = container.get(durabilityKey, PersistentDataType.INTEGER);
-
 
             // If the durability is negative don't decrement durability
             if (durability < 0) return;
