@@ -1,5 +1,6 @@
 # FrostBoats
 Boats, but with Frost Walker so you can boat over lakes of ice instead of water.
+For 1.19+
 
 # How-to
 There are two ways to create Frost Boats.
