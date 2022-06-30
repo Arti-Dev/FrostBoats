@@ -5,6 +5,8 @@ Boats, but with Frost Walker so you can boat over lakes of ice instead of water.
 There are two ways to create Frost Boats.
 - Crafting them with two powder snow buckets, three snow blocks, and of course a boat
 - Combining a boat with a Frost Walker book in an anvil
+All players are given the recipes for FrostBoats automatically when logging in.
+ 
 Boats crafted with crafting tables have limited durability, while boats born from anvils have infinite durability.
 
 You can also disable the plugin's crafting table recipes or anvil recipes with the config file.
