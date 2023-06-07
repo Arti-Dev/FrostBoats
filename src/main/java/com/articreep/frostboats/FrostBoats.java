@@ -33,7 +33,7 @@ public final class FrostBoats extends JavaPlugin {
     public static final Set<Material> materials = Set.of(Material.ACACIA_BOAT, Material.BIRCH_BOAT, Material.DARK_OAK_BOAT, Material.JUNGLE_BOAT,
             Material.MANGROVE_BOAT, Material.OAK_BOAT, Material.SPRUCE_BOAT, Material.ACACIA_CHEST_BOAT, Material.BIRCH_CHEST_BOAT,
             Material.DARK_OAK_CHEST_BOAT, Material.JUNGLE_CHEST_BOAT, Material.MANGROVE_CHEST_BOAT, Material.OAK_CHEST_BOAT,
-            Material.SPRUCE_CHEST_BOAT);
+            Material.SPRUCE_CHEST_BOAT, Material.CHERRY_BOAT, Material.CHERRY_CHEST_BOAT, Material.BAMBOO_CHEST_RAFT, Material.BAMBOO_RAFT);
     private static NamespacedKey durabilityKey;
 
 
@@ -52,7 +52,7 @@ public final class FrostBoats extends JavaPlugin {
 
         loadRecipes();
 
-        Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "Get frosting! Plugin loaded.");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "FrostBoats loaded");
     }
 
     @Override
@@ -61,7 +61,7 @@ public final class FrostBoats extends JavaPlugin {
             Bukkit.removeRecipe(key);
         }
 
-        Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "Unloaded recipes!");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "FrostBoats recipes and plugin unloaded");
     }
 
     void loadRecipes() {
