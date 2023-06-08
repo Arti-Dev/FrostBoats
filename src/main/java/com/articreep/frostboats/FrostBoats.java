@@ -12,10 +12,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public final class FrostBoats extends JavaPlugin {
     private static FrostBoats plugin;
@@ -30,12 +27,21 @@ public final class FrostBoats extends JavaPlugin {
     private static boolean loadAnvilRecipes = true;
     private static boolean hideInfiniteDurability = false;
 
-    public static final Set<Material> materials = Set.of(Material.ACACIA_BOAT, Material.BIRCH_BOAT, Material.DARK_OAK_BOAT, Material.JUNGLE_BOAT,
+    public static final Set<Material> materials = new HashSet<>();
+    /* (Material.ACACIA_BOAT, Material.BIRCH_BOAT, Material.DARK_OAK_BOAT, Material.JUNGLE_BOAT,
             Material.MANGROVE_BOAT, Material.OAK_BOAT, Material.SPRUCE_BOAT, Material.ACACIA_CHEST_BOAT, Material.BIRCH_CHEST_BOAT,
             Material.DARK_OAK_CHEST_BOAT, Material.JUNGLE_CHEST_BOAT, Material.MANGROVE_CHEST_BOAT, Material.OAK_CHEST_BOAT,
-            Material.SPRUCE_CHEST_BOAT, Material.CHERRY_BOAT, Material.CHERRY_CHEST_BOAT, Material.BAMBOO_CHEST_RAFT, Material.BAMBOO_RAFT);
+            Material.SPRUCE_CHEST_BOAT, Material.CHERRY_BOAT, Material.CHERRY_CHEST_BOAT, Material.BAMBOO_CHEST_RAFT, Material.BAMBOO_RAFT) */
     private static NamespacedKey durabilityKey;
 
+    static {
+        for (Material material : Material.values()) {
+            if (!material.isFuel() || material.getMaxStackSize() != 1) continue;
+            if (material.name().endsWith("_BOAT") || material.name().endsWith("_RAFT")) {
+                materials.add(material);
+            }
+        }
+    }
 
     @Override
     public void onEnable() {
