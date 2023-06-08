@@ -3,7 +3,7 @@ Boats, but with Frost Walker so you can boat over lakes of ice instead of water.
 
 Video: https://youtu.be/GK0poI9zDg8
 
-For 1.19+
+The latest release supports Minecraft versions 1.17.x to 1.20.x.
 
 # How-to
 There are two ways to create Frost Boats.
