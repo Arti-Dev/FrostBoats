@@ -154,7 +154,7 @@ public final class FrostBoats extends JavaPlugin {
     }
 
     /**
-     * Constructs a FrostBoat ItemStack.
+     * Constructs a fresh FrostBoat ItemStack.
      * @param material The item material - must be a boat
      * @param durability The durability of the FrostBoat
      * @param level The level of Frost Walker to apply to the boat
@@ -185,7 +185,7 @@ public final class FrostBoats extends JavaPlugin {
     }
 
     /**
-     * Constructs a FrostBoat ItemStack with a name. This version is for the Anvil GUI.
+     * Constructs a FrostBoat ItemStack with a name.
      * @param material The item material - must be a boat
      * @param durability The durability of the FrostBoat
      * @param level The level of Frost Walker to apply to the boat
@@ -193,7 +193,9 @@ public final class FrostBoats extends JavaPlugin {
      * @throws IllegalArgumentException if the item material is not a boat or a chest boat
      * @return the newly created Frost Boat ItemStack
      */
-    public static ItemStack createFrostBoat(Material material, int durability, int level, String name) {
+    public static ItemStack createFrostBoat(Material material, int durability, int level, String name) throws IllegalArgumentException {
+
+        if (!materials.contains(material)) throw new IllegalArgumentException("Material supplied is not a Boat or a Boat with Chest.");
 
         ItemStack product = new ItemStack(material);
 

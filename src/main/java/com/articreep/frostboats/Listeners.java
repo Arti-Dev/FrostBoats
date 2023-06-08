@@ -21,6 +21,7 @@ import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -28,6 +29,7 @@ public class Listeners implements Listener {
     final NamespacedKey frostWalkerKey = new NamespacedKey(FrostBoats.getPlugin(), "frost-walker-level");
     final NamespacedKey durabilityKey = new NamespacedKey(FrostBoats.getPlugin(), "durability");
     final NamespacedKey materialKey = new NamespacedKey(FrostBoats.getPlugin(), "material");
+    final NamespacedKey displayNameKey = new NamespacedKey(FrostBoats.getPlugin(), "display-name");
 
     @EventHandler
     public void onBoatPlace(EntityPlaceEvent event) {
@@ -48,16 +50,21 @@ public class Listeners implements Listener {
                 entityContainer.set(frostWalkerKey, PersistentDataType.INTEGER, item.getEnchantments().get(Enchantment.FROST_WALKER));
 
                 // Does this boat have a durability value yet?
-                if (!itemContainer.has(durabilityKey, PersistentDataType.INTEGER)) {
-                    entityContainer.set(durabilityKey, PersistentDataType.INTEGER, FrostBoats.getMaxDurability());
-                } else {
+                if (itemContainer.has(durabilityKey, PersistentDataType.INTEGER)) {
                     // grab the value
                     entityContainer.set(durabilityKey, PersistentDataType.INTEGER,
                             itemContainer.get(durabilityKey, PersistentDataType.INTEGER));
+                } else {
+                    entityContainer.set(durabilityKey, PersistentDataType.INTEGER, FrostBoats.getMaxDurability());
+                }
+
+                // Does this boat have a custom display name?
+                if (item.getItemMeta().hasDisplayName()) {
+                    entityContainer.set(displayNameKey, PersistentDataType.STRING, item.getItemMeta().getDisplayName());
                 }
 
                 // Add the material type to the container.
-                // I would not have to do this if the TreeSpecies enum had mangrove
+                // The TreeSpecies enum is deprecated. If there's a better way, let me know!
                 entityContainer.set(materialKey, PersistentDataType.STRING, item.getType().toString());
 
 
@@ -170,31 +177,32 @@ public class Listeners implements Listener {
         Entity entity = event.getVehicle();
         if (!entity.getPersistentDataContainer().has(frostWalkerKey, PersistentDataType.INTEGER)) return;
 
+        // If the player is in creative mode don't worry about this. If there's a boat let it disappear
+        if (event.getAttacker() instanceof Player p) {
+            if (p.getGameMode() == GameMode.CREATIVE) {
+                return;
+            }
+        }
+
+        // Don't drop the vanilla boat otherwise
+        event.setCancelled(true);
+
+        Boat boat = (Boat) entity;
+        World w = boat.getWorld();
+        ItemStack item;
+        Material material;
+        PersistentDataContainer container = boat.getPersistentDataContainer();
+        String displayName;
+
+        // Construct an ItemStack with the proper material stored in the data container
+        // Backwards "compatibility": If the key doesn't exist, drop an oak boat.
+        if (container.get(materialKey, PersistentDataType.STRING) == null) {
+            material = Material.OAK_BOAT;
+        } else {
+            material = Material.valueOf(container.get(materialKey, PersistentDataType.STRING));
+        }
+
         if (entity.getPersistentDataContainer().get(frostWalkerKey, PersistentDataType.INTEGER) > 0) {
-            Boat boat = (Boat) entity;
-
-            // If the player is in creative mode don't worry about this, let the boat just disappear
-            if (event.getAttacker() instanceof Player p) {
-                if (p.getGameMode() == GameMode.CREATIVE) {
-                    return;
-                }
-            }
-
-            // Don't drop the vanilla boat otherwise
-            event.setCancelled(true);
-
-            World w = boat.getWorld();
-            ItemStack item;
-            Material material;
-            PersistentDataContainer container = boat.getPersistentDataContainer();
-
-            // Construct an ItemStack with the proper material stored in the data container
-            // Backwards "compatibility": If the key doesn't exist, drop an oak boat.
-            if (container.get(materialKey, PersistentDataType.STRING) == null) {
-                material = Material.OAK_BOAT;
-            } else {
-                material = Material.valueOf(container.get(materialKey, PersistentDataType.STRING));
-            }
 
             // Ensure their frost walker is retained
             int frostLevel = container.get(frostWalkerKey, PersistentDataType.INTEGER);
@@ -202,15 +210,24 @@ public class Listeners implements Listener {
             // Transfer the remaining durability to the item
             int durability = container.get(durabilityKey, PersistentDataType.INTEGER);
 
-            item = FrostBoats.createFrostBoat(material, durability, frostLevel);
+            // Transfer their boat's display name (if applicable)
+            displayName = container.get(displayNameKey, PersistentDataType.STRING);
 
-            // Kill the existing boat
-            boat.remove();
+            item = FrostBoats.createFrostBoat(material, durability, frostLevel, displayName);
 
-            // Give them their item back!
-            w.dropItem(boat.getLocation(), item);
-
+        } else {
+            displayName = container.get(displayNameKey, PersistentDataType.STRING);
+            item = new ItemStack(material);
+            ItemMeta meta = item.getItemMeta();
+            meta.setDisplayName(displayName);
+            item.setItemMeta(meta);
         }
+
+        // Kill the existing boat
+        boat.remove();
+
+        // Give them their item back!
+        w.dropItem(boat.getLocation(), item);
     }
 
     @EventHandler
@@ -233,6 +250,7 @@ public class Listeners implements Listener {
             for (NamespacedKey key : FrostBoats.getRecipeKeys()) {
                 if (recipe.getKey().equals(key)) {
                     e.getWhoClicked().getInventory().addItem(new ItemStack(Material.BUCKET, 2));
+                    return;
                 }
             }
         }
@@ -268,7 +286,9 @@ public class Listeners implements Listener {
                     if (cost > 39) cost = 39;
                     inventory.setRepairCost(cost);
                     event.setResult(product);
+
                 }
+                return;
 
             }
         }
