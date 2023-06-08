@@ -282,9 +282,11 @@ public class Listeners implements Listener {
                     int frostLevel = meta.getStoredEnchantLevel(Enchantment.FROST_WALKER);
                     ItemStack product = FrostBoats.createFrostBoat(itemboat.getType(), -1, frostLevel, inventory.getRenameText());
                     // Formula is base-cost * level, caps at 40
-                    int cost = FrostBoats.getBaseAnvilCost() * frostLevel;
-                    if (cost > 39) cost = 39;
-                    inventory.setRepairCost(cost);
+                    Bukkit.getScheduler().runTask(FrostBoats.getPlugin(), () -> {
+                        int cost = FrostBoats.getBaseAnvilCost() * frostLevel;
+                        if (cost > 39) cost = 39;
+                        inventory.setRepairCost(cost);
+                    });
                     event.setResult(product);
 
                 }
