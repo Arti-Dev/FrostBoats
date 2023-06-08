@@ -8,7 +8,7 @@ The latest release supports Minecraft versions 1.17.x to 1.20.x.
 # How-to
 There are two ways to create Frost Boats.
 - Crafting them with two powder snow buckets, three snow blocks, and of course a boat
-- Combining a boat with a Frost Walker book in an anvil (Paper servers only)
+- Combining a boat with a Frost Walker book in an anvil.
 
 All players are given the recipes for FrostBoats automatically when logging in.
  
