@@ -9,6 +9,7 @@ For 1.19+
 There are two ways to create Frost Boats.
 - Crafting them with two powder snow buckets, three snow blocks, and of course a boat
 - Combining a boat with a Frost Walker book in an anvil (Paper servers only)
+
 All players are given the recipes for FrostBoats automatically when logging in.
  
 Boats crafted with crafting tables have limited durability, while boats born from anvils have infinite durability.
